@@ -17,6 +17,7 @@
       --shadow: 0 6px 18px rgba(240, 98, 146, 0.12);
       --danger: #d65c74;
       --green: #2a9d74;
+      --warning: #ff9800;
     }
 
     * { box-sizing: border-box; }
@@ -29,7 +30,7 @@
     }
 
     .container {
-      max-width: 1500px;
+      max-width: 1600px;
       margin: 30px auto;
       padding: 20px;
     }
@@ -160,6 +161,12 @@
       gap: 24px;
     }
 
+    .three-col {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+    }
+
     .section {
       background: var(--panel);
       border: 1px solid var(--border);
@@ -203,6 +210,7 @@
 
     .money {
       font-variant-numeric: tabular-nums;
+      text-align: right;
     }
 
     .ledger-group {
@@ -238,13 +246,6 @@
       background: #d14163;
     }
 
-    .statement-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 20px;
-      padding: 18px;
-    }
-
     .statement-card {
       background: #fffafd;
       border: 1px solid var(--border);
@@ -256,6 +257,8 @@
       margin-top: 0;
       margin-bottom: 14px;
       font-size: 1.4rem;
+      border-bottom: 2px solid var(--primary);
+      padding-bottom: 8px;
     }
 
     .statement-row {
@@ -266,11 +269,31 @@
       border-bottom: 1px solid #f4e2eb;
     }
 
+    .statement-row.indent {
+      padding-left: 20px;
+    }
+
+    .statement-row.subtotal {
+      font-weight: 700;
+      border-top: 2px solid var(--border);
+      padding-top: 10px;
+      border-bottom: none;
+    }
+
     .statement-row.total {
       font-weight: 700;
-      font-size: 1.1rem;
-      border-bottom: none;
+      font-size: 1.15rem;
+      border-top: 3px double var(--border);
       padding-top: 12px;
+      border-bottom: none;
+    }
+
+    .statement-row.balanced {
+      color: var(--green);
+    }
+
+    .statement-row.unbalanced {
+      color: var(--danger);
     }
 
     .footer {
@@ -282,12 +305,12 @@
       font-size: 1.1rem;
     }
 
-    @media (max-width: 1100px) {
+    @media (max-width: 1200px) {
       .form-grid {
         grid-template-columns: repeat(3, minmax(160px, 1fr));
       }
 
-      .two-col, .statement-grid {
+      .two-col, .three-col {
         grid-template-columns: 1fr;
       }
     }
@@ -331,7 +354,7 @@
         </div>
 
         <div class="field">
-          <label for="debitTitle">Debit Title</label>
+          <label for="debitTitle">Debit Account</label>
           <input id="debitTitle" type="text" placeholder="Cash" />
         </div>
 
@@ -341,7 +364,7 @@
         </div>
 
         <div class="field">
-          <label for="creditTitle">Credit Title</label>
+          <label for="creditTitle">Credit Account</label>
           <input id="creditTitle" type="text" placeholder="Sales Revenue" />
         </div>
 
@@ -379,9 +402,9 @@
             <tr>
               <th>Date</th>
               <th>Entry Title</th>
-              <th>Debit Title</th>
+              <th>Debit Account</th>
               <th>Debit Amount</th>
-              <th>Credit Title</th>
+              <th>Credit Account</th>
               <th>Credit Amount</th>
               <th>Action</th>
             </tr>
@@ -397,43 +420,88 @@
     </div>
 
     <div class="section" style="margin-top: 24px;">
-      <div class="section-header">Financial Statement</div>
-      <div class="statement-grid">
-        <div class="statement-card">
-          <h3>Income Statement</h3>
-          <div class="statement-row">
-            <span>Revenue</span>
-            <span id="revenueTotal">$0.00</span>
-          </div>
-          <div class="statement-row">
-            <span>Expenses</span>
-            <span id="expenseTotal">$0.00</span>
-          </div>
-          <div class="statement-row total">
-            <span>Net Income</span>
-            <span id="netIncomeTotal">$0.00</span>
-          </div>
-        </div>
+      <div class="section-header">Income Statement</div>
+      <div style="padding: 18px;">
+        <table>
+          <tr>
+            <td style="border: none;">Revenue</td>
+            <td class="money" style="border: none;" id="incomeRevenue">$0.00</td>
+          </tr>
+          <tr>
+            <td style="border: none;">Less: Expenses</td>
+            <td class="money" style="border: none;" id="incomeExpenses">$0.00</td>
+          </tr>
+          <tr style="border-top: 3px double #f3d6e3;">
+            <td style="font-weight: 700; border: none;">Net Income</td>
+            <td class="money" style="font-weight: 700; font-size: 1.15rem; border: none;" id="incomeNet">$0.00</td>
+          </tr>
+        </table>
+      </div>
+    </div>
 
-        <div class="statement-card">
-          <h3>Balance Sheet</h3>
-          <div class="statement-row">
-            <span>Assets</span>
-            <span id="assetsTotal">$0.00</span>
-          </div>
-          <div class="statement-row">
-            <span>Liabilities</span>
-            <span id="liabilitiesTotal">$0.00</span>
-          </div>
-          <div class="statement-row">
-            <span>Equity</span>
-            <span id="equityTotal">$0.00</span>
-          </div>
-          <div class="statement-row total">
-            <span>Total</span>
-            <span id="balanceSheetTotal">$0.00</span>
-          </div>
+    <div class="three-col" style="margin-top: 24px;">
+      <div class="section">
+        <div class="section-header">Trial Balance</div>
+        <table>
+          <thead>
+            <tr>
+              <th>Account</th>
+              <th class="money">Debit</th>
+              <th class="money">Credit</th>
+            </tr>
+          </thead>
+          <tbody id="trialBalanceBody"></tbody>
+        </table>
+      </div>
+
+      <div class="section">
+        <div class="section-header">Balance Sheet</div>
+        <div style="padding: 16px;">
+          <table style="font-size: 13px;">
+            <tr>
+              <td style="border: none; font-weight: 700;">Assets</td>
+              <td class="money" style="border: none;" id="balAssets">$0.00</td>
+            </tr>
+            <tr>
+              <td style="border: none; font-weight: 700;">Liabilities</td>
+              <td class="money" style="border: none;" id="balLiabilities">$0.00</td>
+            </tr>
+            <tr>
+              <td style="border: none; font-weight: 700;">Equity</td>
+              <td class="money" style="border: none;" id="balEquity">$0.00</td>
+            </tr>
+            <tr style="border-top: 3px double #f3d6e3;">
+              <td style="border: none; font-weight: 700;">L + E Total</td>
+              <td class="money" style="border: none; font-weight: 700;" id="balTotal">$0.00</td>
+            </tr>
+            <tr>
+              <td style="border: none; padding-top: 10px;" id="balanceEquation">✓ Balanced</td>
+              <td style="border: none;"></td>
+            </tr>
+          </table>
         </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header">Cash Flow</div>
+        <table>
+          <tr>
+            <td style="border: none; font-weight: 700;">Operating</td>
+            <td class="money" style="border: none;" id="cashOp">$0.00</td>
+          </tr>
+          <tr>
+            <td style="border: none; font-weight: 700;">Investing</td>
+            <td class="money" style="border: none;" id="cashInv">$0.00</td>
+          </tr>
+          <tr>
+            <td style="border: none; font-weight: 700;">Financing</td>
+            <td class="money" style="border: none;" id="cashFin">$0.00</td>
+          </tr>
+          <tr style="border-top: 3px double #f3d6e3;">
+            <td style="border: none; font-weight: 700;">Net Change</td>
+            <td class="money" style="border: none; font-weight: 700;" id="cashNet">$0.00</td>
+          </tr>
+        </table>
       </div>
     </div>
 
@@ -464,6 +532,18 @@
       return Number.isFinite(n) ? n : 0;
     }
 
+    function categorizeAccount(name) {
+      const lower = name.toLowerCase();
+      
+      if (/revenue|sales|income|service|commission|gain/.test(lower)) return "revenue";
+      if (/expense|rent|salary|wage|utility|insurance|supply|advertising|depreciation|cost|fee|supplies/.test(lower)) return "expense";
+      if (/cash|inventory|equipment|building|vehicle|receivable|asset|bank|account|prepaid|land/.test(lower)) return "asset";
+      if (/payable|loan|note|liability|debt|mortgage|bond/.test(lower)) return "liability";
+      if (/equity|capital|owner|retained|drawing|owner's|owners/.test(lower)) return "equity";
+      
+      return "other";
+    }
+
     function renderSummary(entries) {
       const totalDebits = entries.reduce((sum, entry) => sum + num(entry.debitAmount), 0);
       const totalCredits = entries.reduce((sum, entry) => sum + num(entry.creditAmount), 0);
@@ -478,13 +558,7 @@
       tbody.innerHTML = "";
 
       if (!entries.length) {
-        tbody.innerHTML = `
-          <tr>
-            <td colspan="7">
-              <div class="empty">No entries yet.</div>
-            </td>
-          </tr>
-        `;
+        tbody.innerHTML = `<tr><td colspan="7"><div class="empty">No entries yet.</div></td></tr>`;
         return;
       }
 
@@ -593,58 +667,122 @@
       container.innerHTML = groupsHtml.join("");
     }
 
-    function categorizeAccount(accountName) {
-      const a = accountName.toLowerCase();
-
-      if (/cash|inventory|equipment|building|vehicle|accounts receivable|supplies|land|prepaid|bank|asset/.test(a)) return "asset";
-      if (/payable|loan|note|liability|debt/.test(a)) return "liability";
-      if (/equity|capital|owner|retained|drawings/.test(a)) return "equity";
-      if (/revenue|sales|income|service|commission|gain/.test(a)) return "revenue";
-      if (/expense|rent|salary|wages|utilities|insurance|supplies|advertising|depreciation|cost|fee/.test(a)) return "expense";
-      return "other";
-    }
-
-    function computeFinancialStatement(entries) {
+    function renderFinancialStatements(entries) {
       const ledgerMap = buildLedger(entries);
+      const accounts = new Map();
+
+      // Calculate balance for each account
+      ledgerMap.forEach((items, accountName) => {
+        let balance = 0;
+        items.forEach(item => {
+          balance += item.debit - item.credit;
+        });
+        const category = categorizeAccount(accountName);
+        accounts.set(accountName, { balance, category });
+      });
+
+      // Income Statement
       let revenue = 0;
       let expenses = 0;
-      let assets = 0;
-      let liabilities = 0;
-      let equity = 0;
 
-      ledgerMap.forEach((items, accountName) => {
-        const category = categorizeAccount(accountName);
-        let net = 0;
-
-        items.forEach(item => {
-          net += item.debit - item.credit;
-        });
-
-        if (category === "revenue") {
-          revenue += Math.max(net, 0);
-        } else if (category === "expense") {
-          expenses += Math.abs(net);
-        } else if (category === "asset") {
-          assets += net;
-        } else if (category === "liability") {
-          liabilities += net;
-        } else if (category === "equity") {
-          equity += net;
+      accounts.forEach((data, name) => {
+        if (data.category === "revenue") {
+          revenue += data.balance;
+        } else if (data.category === "expense") {
+          expenses += Math.abs(data.balance);
         }
       });
 
       const netIncome = revenue - expenses;
+      document.getElementById("incomeRevenue").textContent = money(revenue);
+      document.getElementById("incomeExpenses").textContent = money(expenses);
+      document.getElementById("incomeNet").textContent = money(netIncome);
 
-      document.getElementById("revenueTotal").textContent = money(revenue);
-      document.getElementById("expenseTotal").textContent = money(expenses);
-      document.getElementById("netIncomeTotal").textContent = money(netIncome);
+      // Trial Balance
+      let totalDebit = 0;
+      let totalCredit = 0;
+      const tbHtml = [];
 
-      document.getElementById("assetsTotal").textContent = money(assets);
-      document.getElementById("liabilitiesTotal").textContent = money(liabilities);
-      document.getElementById("equityTotal").textContent = money(equity);
+      accounts.forEach((data, name) => {
+        const balance = data.balance;
+        if (balance >= 0) {
+          totalDebit += balance;
+          tbHtml.push(`
+            <tr>
+              <td>${name}</td>
+              <td class="money">${money(balance)}</td>
+              <td class="money">-</td>
+            </tr>
+          `);
+        } else {
+          totalCredit += Math.abs(balance);
+          tbHtml.push(`
+            <tr>
+              <td>${name}</td>
+              <td class="money">-</td>
+              <td class="money">${money(Math.abs(balance))}</td>
+            </tr>
+          `);
+        }
+      });
 
-      const totalSheet = assets - liabilities - equity;
-      document.getElementById("balanceSheetTotal").textContent = money(totalSheet);
+      tbHtml.push(`
+        <tr style="border-top: 3px double #f3d6e3; font-weight: 700;">
+          <td>TOTAL</td>
+          <td class="money">${money(totalDebit)}</td>
+          <td class="money">${money(totalCredit)}</td>
+        </tr>
+      `);
+
+      document.getElementById("trialBalanceBody").innerHTML = tbHtml.join("");
+
+      // Balance Sheet
+      let assets = 0;
+      let liabilities = 0;
+      let equity = 0;
+
+      accounts.forEach((data, name) => {
+        if (data.category === "asset") {
+          assets += data.balance;
+        } else if (data.category === "liability") {
+          liabilities += data.balance;
+        } else if (data.category === "equity") {
+          equity += data.balance;
+        }
+      });
+
+      const totalLE = liabilities + equity;
+      const balanced = Math.abs(assets - totalLE) < 0.01;
+
+      document.getElementById("balAssets").textContent = money(assets);
+      document.getElementById("balLiabilities").textContent = money(liabilities);
+      document.getElementById("balEquity").textContent = money(equity);
+      document.getElementById("balTotal").textContent = money(totalLE);
+      document.getElementById("balanceEquation").textContent = balanced ? "✓ Balanced" : "✗ Not Balanced";
+      document.getElementById("balanceEquation").style.color = balanced ? "#2a9d74" : "#d65c74";
+
+      // Cash Flow Statement
+      let operating = 0;
+      let investing = 0;
+      let financing = 0;
+
+      accounts.forEach((data, name) => {
+        const lower = name.toLowerCase();
+        if (/cash|receivable|payable|revenue|expense/.test(lower)) {
+          operating += data.balance;
+        } else if (/equipment|building|vehicle|investment/.test(lower)) {
+          investing += data.balance;
+        } else if (/loan|bond|capital|owner|equity/.test(lower)) {
+          financing += data.balance;
+        }
+      });
+
+      const netChange = operating + investing + financing;
+
+      document.getElementById("cashOp").textContent = money(operating);
+      document.getElementById("cashInv").textContent = money(investing);
+      document.getElementById("cashFin").textContent = money(financing);
+      document.getElementById("cashNet").textContent = money(netChange);
     }
 
     function renderAll() {
@@ -652,7 +790,7 @@
       renderSummary(entries);
       renderJournal(entries);
       renderLedger(entries);
-      computeFinancialStatement(entries);
+      renderFinancialStatements(entries);
     }
 
     function addEntry() {
@@ -664,7 +802,7 @@
       const creditAmount = num(document.getElementById("creditAmount").value);
 
       if (!date || !entryTitle || !debitTitle || !creditTitle) {
-        alert("Please fill in the date, entry title, debit title, and credit title.");
+        alert("Please fill in the date, entry title, debit account, and credit account.");
         return;
       }
 
