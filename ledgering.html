@@ -28,7 +28,7 @@
     }
 
     .container {
-      max-width: 1400px;
+      max-width: 1500px;
       margin: 30px auto;
       padding: 20px;
     }
@@ -69,7 +69,7 @@
 
     .form-grid {
       display: grid;
-      grid-template-columns: 1.2fr 1fr 1fr;
+      grid-template-columns: 1fr 1.3fr 1.2fr 1fr 1.2fr 1fr;
       gap: 14px;
       align-items: end;
     }
@@ -115,7 +115,7 @@
       border: none;
       font-weight: 700;
       cursor: pointer;
-      margin-top: 14px;
+      margin-top: 18px;
     }
 
     .primary-btn:hover {
@@ -155,7 +155,7 @@
 
     .two-col {
       display: grid;
-      grid-template-columns: 1.2fr 1fr;
+      grid-template-columns: 1.5fr 1fr;
       gap: 24px;
     }
 
@@ -246,13 +246,31 @@
       font-size: 1.1rem;
     }
 
-    @media (max-width: 900px) {
+    @media (max-width: 1100px) {
       .form-grid {
-        grid-template-columns: 1fr;
+        grid-template-columns: repeat(3, minmax(160px, 1fr));
       }
 
       .two-col {
         grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .form-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .summary-row {
+        grid-template-columns: 1fr;
+      }
+
+      h1 {
+        font-size: 2rem;
+      }
+
+      .title-row {
+        flex-direction: column;
       }
     }
   </style>
@@ -267,242 +285,5 @@
     <div class="panel">
       <div class="form-grid">
         <div class="field">
-          <label for="title">Title</label>
-          <input id="title" type="text" placeholder="Cash Sale" />
-        </div>
-
-        <div class="field">
-          <label for="debit">Debit</label>
-          <input id="debit" type="number" min="0" step="0.01" placeholder="0.00" />
-        </div>
-
-        <div class="field">
-          <label for="credit">Credit</label>
-          <input id="credit" type="number" min="0" step="0.01" placeholder="0.00" />
-        </div>
-      </div>
-
-      <button id="addEntryBtn" class="primary-btn">Add Entry</button>
-
-      <div class="summary-row">
-        <div class="summary-box">
-          <span class="summary-title">Total Debits</span>
-          <span id="totalDebits" class="summary-value">$0.00</span>
-        </div>
-
-        <div class="summary-box">
-          <span class="summary-title">Total Credits</span>
-          <span id="totalCredits" class="summary-value">$0.00</span>
-        </div>
-
-        <div class="summary-box">
-          <span class="summary-title">Difference</span>
-          <span id="netDifference" class="summary-value">$0.00</span>
-        </div>
-      </div>
-    </div>
-
-    <div class="two-col">
-      <div class="section">
-        <div class="section-header">Journal Entries</div>
-        <table>
-          <thead>
-            <tr>
-              <th>Title</th>
-              <th>Debit</th>
-              <th>Credit</th>
-              <th>Action</th>
-            </tr>
-          </thead>
-          <tbody id="journalBody"></tbody>
-        </table>
-      </div>
-
-      <div class="section">
-        <div class="section-header">Ledger</div>
-        <div id="ledgerContainer"></div>
-      </div>
-    </div>
-
-    <div class="footer">Made by Breanna 💕</div>
-  </div>
-
-  <script>
-    const storageKey = "journalSimpleEntries";
-
-    function loadEntries() {
-      const saved = localStorage.getItem(storageKey);
-      return saved ? JSON.parse(saved) : [];
-    }
-
-    function saveEntries(entries) {
-      localStorage.setItem(storageKey, JSON.stringify(entries));
-    }
-
-    function money(value) {
-      return new Intl.NumberFormat("en-US", {
-        style: "currency",
-        currency: "USD"
-      }).format(Number(value) || 0);
-    }
-
-    function num(value) {
-      const n = Number(value);
-      return Number.isFinite(n) ? n : 0;
-    }
-
-    function renderSummary(entries) {
-      const totalDebits = entries.reduce((sum, entry) => sum + num(entry.debit), 0);
-      const totalCredits = entries.reduce((sum, entry) => sum + num(entry.credit), 0);
-
-      document.getElementById("totalDebits").textContent = money(totalDebits);
-      document.getElementById("totalCredits").textContent = money(totalCredits);
-      document.getElementById("netDifference").textContent = money(totalDebits - totalCredits);
-    }
-
-    function renderJournal(entries) {
-      const tbody = document.getElementById("journalBody");
-      tbody.innerHTML = "";
-
-      if (!entries.length) {
-        tbody.innerHTML = `
-          <tr>
-            <td colspan="4">
-              <div class="empty">No entries yet.</div>
-            </td>
-          </tr>
-        `;
-        return;
-      }
-
-      entries.forEach((entry, index) => {
-        const row = document.createElement("tr");
-        row.innerHTML = `
-          <td>${entry.title}</td>
-          <td class="money">${entry.debit ? money(entry.debit) : "-"}</td>
-          <td class="money">${entry.credit ? money(entry.credit) : "-"}</td>
-          <td><button class="delete-btn" data-index="${index}">Delete</button></td>
-        `;
-        tbody.appendChild(row);
-      });
-
-      document.querySelectorAll(".delete-btn").forEach(btn => {
-        btn.addEventListener("click", () => {
-          const index = Number(btn.dataset.index);
-          const updated = loadEntries();
-          updated.splice(index, 1);
-          saveEntries(updated);
-          renderAll();
-        });
-      });
-    }
-
-    function renderLedger(entries) {
-      const container = document.getElementById("ledgerContainer");
-      const ledgerMap = new Map();
-
-      entries.forEach(entry => {
-        const title = (entry.title || "Untitled").trim();
-
-        if (!ledgerMap.has(title)) {
-          ledgerMap.set(title, []);
-        }
-
-        ledgerMap.get(title).push({
-          title: title,
-          debit: num(entry.debit),
-          credit: num(entry.credit)
-        });
-      });
-
-      if (!ledgerMap.size) {
-        container.innerHTML = '<div class="empty">No ledger entries yet.</div>';
-        return;
-      }
-
-      const html = [];
-
-      ledgerMap.forEach((items, title) => {
-        let runningBalance = 0;
-
-        const rows = items.map(item => {
-          runningBalance += item.debit - item.credit;
-          return `
-            <tr>
-              <td>${item.title}</td>
-              <td class="money">${item.debit ? money(item.debit) : "-"}</td>
-              <td class="money">${item.credit ? money(item.credit) : "-"}</td>
-              <td class="money">${money(runningBalance)}</td>
-            </tr>
-          `;
-        }).join("");
-
-        html.push(`
-          <div class="ledger-group">
-            <h3>${title}</h3>
-            <table>
-              <thead>
-                <tr>
-                  <th>Title</th>
-                  <th>Debit</th>
-                  <th>Credit</th>
-                  <th>Balance</th>
-                </tr>
-              </thead>
-              <tbody>${rows}</tbody>
-            </table>
-          </div>
-        `);
-      });
-
-      container.innerHTML = html.join("");
-    }
-
-    function renderAll() {
-      const entries = loadEntries();
-      renderSummary(entries);
-      renderJournal(entries);
-      renderLedger(entries);
-    }
-
-    function addEntry() {
-      const title = document.getElementById("title").value.trim();
-      const debit = num(document.getElementById("debit").value);
-      const credit = num(document.getElementById("credit").value);
-
-      if (!title) {
-        alert("Please enter a title.");
-        return;
-      }
-
-      if (!debit && !credit) {
-        alert("Please enter at least one value for debit or credit.");
-        return;
-      }
-
-      if (debit > 0 && credit > 0) {
-        alert("Use either debit or credit for this entry, not both.");
-        return;
-      }
-
-      const entries = loadEntries();
-      entries.push({
-        title,
-        debit,
-        credit
-      });
-
-      saveEntries(entries);
-
-      document.getElementById("title").value = "";
-      document.getElementById("debit").value = "";
-      document.getElementById("credit").value = "";
-
-      renderAll();
-    }
-
-    document.getElementById("addEntryBtn").addEventListener("click", addEntry);
-    renderAll();
-  </script>
-</body>
-</html>
+          <label*
+
