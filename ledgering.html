@@ -8,20 +8,18 @@
     :root {
       --bg: #fff3f7;
       --panel: #ffffff;
-      --soft: #ffe8f1;
+      --soft: #ffe7f1;
       --primary: #f06292;
       --primary-dark: #e91e63;
-      --text: #3b2d39;
-      --muted: #70576a;
-      --border: #f3d7e6;
-      --green: #2fa47c;
-      --red: #d64b61;
+      --text: #382d38;
+      --muted: #6d5367;
+      --border: #f3d6e3;
       --shadow: 0 6px 18px rgba(240, 98, 146, 0.12);
+      --green: #2aa678;
+      --danger: #d65c74;
     }
 
-    * {
-      box-sizing: border-box;
-    }
+    * { box-sizing: border-box; }
 
     body {
       margin: 0;
@@ -31,35 +29,34 @@
     }
 
     .container {
-      max-width: 1300px;
+      max-width: 1400px;
       margin: 30px auto;
-      padding: 24px;
+      padding: 20px;
     }
 
-    .title-wrap {
+    .title-row {
       display: flex;
-      align-items: center;
       justify-content: center;
-      gap: 18px;
-      margin-bottom: 28px;
-    }
-
-    .title-wrap h1 {
-      margin: 0;
-      font-size: 2.6rem;
-      letter-spacing: 0.03em;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 26px;
     }
 
     .logo {
       width: 62px;
       height: 62px;
-      background: linear-gradient(135deg, #ffdbe8, #f4a7c2);
+      background: linear-gradient(135deg, #ffdfea, #f7bfd2);
       border-radius: 16px;
-      display: grid;
-      place-items: center;
       border: 1px solid var(--border);
       box-shadow: var(--shadow);
-      font-size: 1.8rem;
+      display: grid;
+      place-items: center;
+      font-size: 2rem;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 2.6rem;
     }
 
     .panel {
@@ -73,7 +70,7 @@
 
     .form-grid {
       display: grid;
-      grid-template-columns: repeat(6, minmax(140px, 1fr));
+      grid-template-columns: repeat(6, minmax(150px, 1fr));
       gap: 14px;
       align-items: end;
     }
@@ -85,7 +82,7 @@
 
     label {
       margin-bottom: 7px;
-      font-size: 12px;
+      font-size: 11px;
       text-transform: uppercase;
       letter-spacing: 0.08em;
       color: var(--muted);
@@ -95,7 +92,7 @@
 
     input, button {
       border-radius: 10px;
-      border: 1px solid #f2ccd9;
+      border: 1px solid #f1ccd8;
       height: 46px;
       padding: 10px 12px;
       font-size: 15px;
@@ -119,26 +116,17 @@
       border: none;
       font-weight: 700;
       cursor: pointer;
-      transition: 0.15s ease;
     }
 
     .primary-btn:hover {
       background: var(--primary-dark);
     }
 
-    .secondary-btn {
-      background: #fff;
-      color: var(--text);
-      border: 1px solid var(--border);
-      cursor: pointer;
-      font-weight: 700;
-    }
-
     .summary-row {
       display: grid;
       grid-template-columns: repeat(3, minmax(180px, 1fr));
       gap: 18px;
-      margin-top: 20px;
+      margin-top: 22px;
     }
 
     .summary-box {
@@ -146,21 +134,21 @@
       border: 1px solid var(--border);
       border-radius: 12px;
       padding: 16px;
-      min-height: 90px;
+      min-height: 85px;
     }
 
-    .summary-box .label {
+    .summary-title {
       display: block;
-      color: var(--muted);
-      font-size: 12px;
-      text-transform: uppercase;
+      font-size: 11px;
       letter-spacing: 0.08em;
-      margin-bottom: 10px;
-      font-family: Arial, Helvetica, sans-serif;
+      text-transform: uppercase;
       font-weight: 700;
+      color: var(--muted);
+      margin-bottom: 8px;
+      font-family: Arial, Helvetica, sans-serif;
     }
 
-    .summary-box .value {
+    .summary-value {
       font-size: 1.7rem;
       font-weight: 700;
     }
@@ -180,7 +168,7 @@
     }
 
     .section-header {
-      background: linear-gradient(135deg, #ffeaf2, #ffdce9);
+      background: linear-gradient(135deg, #ffeaf2, #ffdbe8);
       border-bottom: 1px solid var(--border);
       padding: 14px 18px;
       font-size: 1.35rem;
@@ -193,20 +181,19 @@
     }
 
     th, td {
-      padding: 12px 12px;
-      border-bottom: 1px solid #f7e2ee;
       text-align: left;
+      padding: 12px 10px;
+      border-bottom: 1px solid #f4e2eb;
       font-size: 14px;
     }
 
     th {
-      background: #fff6fa;
+      background: #fff7fb;
       color: var(--muted);
-      font-weight: 700;
       font-family: Arial, Helvetica, sans-serif;
+      font-size: 11px;
       text-transform: uppercase;
       letter-spacing: 0.06em;
-      font-size: 11px;
     }
 
     tbody tr:hover {
@@ -218,51 +205,50 @@
     }
 
     .ledger-group {
-      margin-bottom: 22px;
+      margin-bottom: 24px;
     }
 
     .ledger-group h3 {
-      margin: 0 0 12px;
-      padding: 0 8px;
-      font-size: 1.35rem;
-      color: var(--text);
+      margin: 0 0 10px;
+      padding: 0 10px;
+      font-size: 1.3rem;
     }
 
     .empty {
       padding: 18px 12px;
-      color: var(--muted);
       text-align: center;
+      color: var(--muted);
       font-style: italic;
     }
 
     .delete-btn {
-      background: #f25b79;
+      background: var(--danger);
       color: white;
       border: none;
       border-radius: 8px;
       padding: 8px 10px;
-      font-weight: 700;
       cursor: pointer;
-      height: auto;
       font-size: 12px;
+      font-weight: 700;
+      height: auto;
     }
 
     .delete-btn:hover {
-      background: #dc3e61;
+      background: #d14163;
     }
 
     .footer {
       margin-top: 30px;
       text-align: center;
+      border-top: 1px solid var(--border);
       padding-top: 16px;
       color: var(--muted);
       font-size: 1.1rem;
-      border-top: 1px solid var(--border);
     }
 
-    @media (max-width: 980px) {
+    @media (max-width: 1100px) {
       .form-grid {
-        grid-template-columns: repeat(2, minmax(160px, 1fr));
+        grid-template-columns: repeat(3, minmax(160px, 1fr));
       }
 
       .two-col {
@@ -270,7 +256,7 @@
       }
     }
 
-    @media (max-width: 620px) {
+    @media (max-width: 640px) {
       .form-grid {
         grid-template-columns: 1fr;
       }
@@ -279,20 +265,19 @@
         grid-template-columns: 1fr;
       }
 
-      .title-wrap {
-        flex-direction: column;
-        gap: 10px;
+      h1 {
+        font-size: 2rem;
       }
 
-      .title-wrap h1 {
-        font-size: 2rem;
+      .title-row {
+        flex-direction: column;
       }
     }
   </style>
 </head>
 <body>
   <div class="container">
-    <div class="title-wrap">
+    <div class="title-row">
       <div class="logo">📒</div>
       <h1>Journal & Ledger Tracker</h1>
     </div>
@@ -306,43 +291,48 @@
 
         <div class="field">
           <label for="title">Title</label>
-          <input id="title" type="text" placeholder="Example: Cash Sale" />
+          <input id="title" type="text" placeholder="Cash Sale" />
         </div>
 
         <div class="field">
-          <label for="account">Account</label>
-          <input id="account" type="text" placeholder="Cash" />
+          <label for="debitAccount">Debit Account</label>
+          <input id="debitAccount" type="text" placeholder="Cash" />
         </div>
 
         <div class="field">
-          <label for="debit">Debit</label>
-          <input id="debit" type="number" min="0" step="0.01" placeholder="0.00" />
+          <label for="debitAmount">Debit Amount</label>
+          <input id="debitAmount" type="number" min="0" step="0.01" placeholder="0.00" />
         </div>
 
         <div class="field">
-          <label for="credit">Credit</label>
-          <input id="credit" type="number" min="0" step="0.01" placeholder="0.00" />
+          <label for="creditAccount">Credit Account</label>
+          <input id="creditAccount" type="text" placeholder="Sales Revenue" />
         </div>
 
         <div class="field">
-          <button id="addEntryBtn" class="primary-btn">Add Entry</button>
+          <label for="creditAmount">Credit Amount</label>
+          <input id="creditAmount" type="number" min="0" step="0.01" placeholder="0.00" />
         </div>
+      </div>
+
+      <div style="margin-top: 18px;">
+        <button id="addEntryBtn" class="primary-btn">Add Journal Entry</button>
       </div>
 
       <div class="summary-row">
         <div class="summary-box">
-          <span class="label">Total Debits</span>
-          <span id="totalDebits" class="value">$0.00</span>
+          <span class="summary-title">Total Debits</span>
+          <span id="totalDebits" class="summary-value">$0.00</span>
         </div>
 
         <div class="summary-box">
-          <span class="label">Total Credits</span>
-          <span id="totalCredits" class="value">$0.00</span>
+          <span class="summary-title">Total Credits</span>
+          <span id="totalCredits" class="summary-value">$0.00</span>
         </div>
 
         <div class="summary-box">
-          <span class="label">Net Difference</span>
-          <span id="netDifference" class="value">$0.00</span>
+          <span class="summary-title">Difference</span>
+          <span id="netDifference" class="summary-value">$0.00</span>
         </div>
       </div>
     </div>
@@ -355,9 +345,10 @@
             <tr>
               <th>Date</th>
               <th>Title</th>
-              <th>Account</th>
-              <th>Debit</th>
-              <th>Credit</th>
+              <th>Debit Account</th>
+              <th>Debit Amount</th>
+              <th>Credit Account</th>
+              <th>Credit Amount</th>
               <th>Action</th>
             </tr>
           </thead>
@@ -375,36 +366,36 @@
   </div>
 
   <script>
-    const storageKey = "accountingJournalEntries";
+    const storageKey = "journalLedgerEntries";
 
     function loadEntries() {
-      const data = localStorage.getItem(storageKey);
-      return data ? JSON.parse(data) : [];
+      const saved = localStorage.getItem(storageKey);
+      return saved ? JSON.parse(saved) : [];
     }
 
     function saveEntries(entries) {
       localStorage.setItem(storageKey, JSON.stringify(entries));
     }
 
-    function currency(value) {
+    function money(value) {
       return new Intl.NumberFormat("en-US", {
         style: "currency",
         currency: "USD"
-      }).format(value || 0);
+      }).format(Number(value) || 0);
     }
 
-    function safeNumber(value) {
+    function num(value) {
       const n = Number(value);
       return Number.isFinite(n) ? n : 0;
     }
 
-    function updateSummary(entries) {
-      const totalDebits = entries.reduce((sum, e) => sum + safeNumber(e.debit), 0);
-      const totalCredits = entries.reduce((sum, e) => sum + safeNumber(e.credit), 0);
+    function renderSummary(entries) {
+      const totalDebits = entries.reduce((sum, entry) => sum + num(entry.debitAmount), 0);
+      const totalCredits = entries.reduce((sum, entry) => sum + num(entry.creditAmount), 0);
 
-      document.getElementById("totalDebits").textContent = currency(totalDebits);
-      document.getElementById("totalCredits").textContent = currency(totalCredits);
-      document.getElementById("netDifference").textContent = currency(totalDebits - totalCredits);
+      document.getElementById("totalDebits").textContent = money(totalDebits);
+      document.getElementById("totalCredits").textContent = money(totalCredits);
+      document.getElementById("netDifference").textContent = money(totalDebits - totalCredits);
     }
 
     function renderJournal(entries) {
@@ -414,7 +405,7 @@
       if (!entries.length) {
         tbody.innerHTML = `
           <tr>
-            <td colspan="6">
+            <td colspan="7">
               <div class="empty">No entries yet.</div>
             </td>
           </tr>
@@ -424,16 +415,15 @@
 
       entries.forEach((entry, index) => {
         const row = document.createElement("tr");
-
         row.innerHTML = `
           <td>${entry.date || ""}</td>
           <td>${entry.title}</td>
-          <td>${entry.account}</td>
-          <td class="money">${entry.debit ? currency(entry.debit) : "-"}</td>
-          <td class="money">${entry.credit ? currency(entry.credit) : "-"}</td>
+          <td>${entry.debitAccount}</td>
+          <td class="money">${entry.debitAmount ? money(entry.debitAmount) : "-"}</td>
+          <td>${entry.creditAccount}</td>
+          <td class="money">${entry.creditAmount ? money(entry.creditAmount) : "-"}</td>
           <td><button class="delete-btn" data-index="${index}">Delete</button></td>
         `;
-
         tbody.appendChild(row);
       });
 
@@ -443,7 +433,7 @@
           const updated = loadEntries();
           updated.splice(index, 1);
           saveEntries(updated);
-          render();
+          renderAll();
         });
       });
     }
@@ -452,19 +442,28 @@
       const ledgerMap = new Map();
 
       entries.forEach(entry => {
-        const account = (entry.account || "Unknown").trim();
-        if (!account) return;
+        const debitAccount = (entry.debitAccount || "").trim();
+        const creditAccount = (entry.creditAccount || "").trim();
 
-        if (!ledgerMap.has(account)) {
-          ledgerMap.set(account, []);
+        if (debitAccount) {
+          if (!ledgerMap.has(debitAccount)) ledgerMap.set(debitAccount, []);
+          ledgerMap.get(debitAccount).push({
+            date: entry.date,
+            title: entry.title,
+            debit: num(entry.debitAmount),
+            credit: 0
+          });
         }
 
-        ledgerMap.get(account).push({
-          date: entry.date,
-          title: entry.title,
-          debit: safeNumber(entry.debit),
-          credit: safeNumber(entry.credit)
-        });
+        if (creditAccount) {
+          if (!ledgerMap.has(creditAccount)) ledgerMap.set(creditAccount, []);
+          ledgerMap.get(creditAccount).push({
+            date: entry.date,
+            title: entry.title,
+            debit: 0,
+            credit: num(entry.creditAmount)
+          });
+        }
       });
 
       return ledgerMap;
@@ -479,13 +478,106 @@
         return;
       }
 
-      const html = [];
+      const groupsHtml = [];
 
-      ledgerMap.forEach((accountEntries, accountName) => {
+      ledgerMap.forEach((items, accountName) => {
         let runningBalance = 0;
 
-        const rows = accountEntries.map(item => {
+        const rows = items.map(item => {
           runningBalance += item.debit - item.credit;
           return `
-            <tr>`*
-
+            <tr>
+              <td>${item.date || ""}</td>
+              <td>${item.title}</td>
+              <td class="money">${item.debit ? money(item.debit) : "-"}</td>
+              <td class="money">${item.credit ? money(item.credit) : "-"}</td>
+              <td class="money">${money(runningBalance)}</td>
+            </tr>
+          `;
+        }).join("");
+
+        groupsHtml.push(`
+          <div class="ledger-group">
+            <h3>${accountName}</h3>
+            <table>
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Title</th>
+                  <th>Debit</th>
+                  <th>Credit</th>
+                  <th>Balance</th>
+                </tr>
+              </thead>
+              <tbody>${rows}</tbody>
+            </table>
+          </div>
+        `);
+      });
+
+      container.innerHTML = groupsHtml.join("");
+    }
+
+    function renderAll() {
+      const entries = loadEntries();
+      renderSummary(entries);
+      renderJournal(entries);
+      renderLedger(entries);
+    }
+
+    function addEntry() {
+      const date = document.getElementById("date").value;
+      const title = document.getElementById("title").value.trim();
+      const debitAccount = document.getElementById("debitAccount").value.trim();
+      const debitAmount = num(document.getElementById("debitAmount").value);
+      const creditAccount = document.getElementById("creditAccount").value.trim();
+      const creditAmount = num(document.getElementById("creditAmount").value);
+
+      if (!title || !debitAccount || !creditAccount) {
+        alert("Please fill in the title, debit account, and credit account.");
+        return;
+      }
+
+      if (!debitAmount && !creditAmount) {
+        alert("Please enter a debit amount and/or credit amount.");
+        return;
+      }
+
+      if (debitAmount <= 0 && creditAmount <= 0) {
+        alert("Amounts must be greater than zero.");
+        return;
+      }
+
+      if (debitAmount > 0 && creditAmount > 0) {
+        alert("For a single journal entry, debit and credit should be separate lines with their own accounts.");
+        return;
+      }
+
+      const entries = loadEntries();
+      entries.push({
+        date: date || new Date().toISOString().slice(0, 10),
+        title,
+        debitAccount,
+        debitAmount: debitAmount > 0 ? debitAmount : 0,
+        creditAccount,
+        creditAmount: creditAmount > 0 ? creditAmount : 0
+      });
+
+      saveEntries(entries);
+
+      document.getElementById("date").value = "";
+      document.getElementById("title").value = "";
+      document.getElementById("debitAccount").value = "";
+      document.getElementById("debitAmount").value = "";
+      document.getElementById("creditAccount").value = "";
+      document.getElementById("creditAmount").value = "";
+
+      renderAll();
+    }
+
+    document.getElementById("addEntryBtn").addEventListener("click", addEntry);
+
+    renderAll();
+  </script>
+</body>
+</html>
