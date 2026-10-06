@@ -285,5 +285,291 @@
     <div class="panel">
       <div class="form-grid">
         <div class="field">
-          <label*
-
+          <label for="date">Date</label>
+          <input id="date" type="date" />
+        </div>
+
+        <div class="field">
+          <label for="entryTitle">Entry Title</label>
+          <input id="entryTitle" type="text" placeholder="Cash Sale" />
+        </div>
+
+        <div class="field">
+          <label for="debitTitle">Debit Title</label>
+          <input id="debitTitle" type="text" placeholder="Cash" />
+        </div>
+
+        <div class="field">
+          <label for="debitAmount">Debit Amount</label>
+          <input id="debitAmount" type="number" min="0" step="0.01" placeholder="0.00" />
+        </div>
+
+        <div class="field">
+          <label for="creditTitle">Credit Title</label>
+          <input id="creditTitle" type="text" placeholder="Sales Revenue" />
+        </div>
+
+        <div class="field">
+          <label for="creditAmount">Credit Amount</label>
+          <input id="creditAmount" type="number" min="0" step="0.01" placeholder="0.00" />
+        </div>
+      </div>
+
+      <button id="addEntryBtn" class="primary-btn">Add Entry</button>
+
+      <div class="summary-row">
+        <div class="summary-box">
+          <span class="summary-title">Total Debits</span>
+          <span id="totalDebits" class="summary-value">$0.00</span>
+        </div>
+
+        <div class="summary-box">
+          <span class="summary-title">Total Credits</span>
+          <span id="totalCredits" class="summary-value">$0.00</span>
+        </div>
+
+        <div class="summary-box">
+          <span class="summary-title">Difference</span>
+          <span id="netDifference" class="summary-value">$0.00</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="two-col">
+      <div class="section">
+        <div class="section-header">Journal Entries</div>
+        <table>
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Entry Title</th>
+              <th>Debit Title</th>
+              <th>Debit Amount</th>
+              <th>Credit Title</th>
+              <th>Credit Amount</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody id="journalBody"></tbody>
+        </table>
+      </div>
+
+      <div class="section">
+        <div class="section-header">Ledger</div>
+        <div id="ledgerContainer"></div>
+      </div>
+    </div>
+
+    <div class="footer">Made by Breanna 💕</div>
+  </div>
+
+  <script>
+    const storageKey = "journalLedgerEntries";
+
+    function loadEntries() {
+      const saved = localStorage.getItem(storageKey);
+      return saved ? JSON.parse(saved) : [];
+    }
+
+    function saveEntries(entries) {
+      localStorage.setItem(storageKey, JSON.stringify(entries));
+    }
+
+    function money(value) {
+      return new Intl.NumberFormat("en-US", {
+        style: "currency",
+        currency: "USD"
+      }).format(Number(value) || 0);
+    }
+
+    function num(value) {
+      const n = Number(value);
+      return Number.isFinite(n) ? n : 0;
+    }
+
+    function renderSummary(entries) {
+      const totalDebits = entries.reduce((sum, entry) => sum + num(entry.debitAmount), 0);
+      const totalCredits = entries.reduce((sum, entry) => sum + num(entry.creditAmount), 0);
+
+      document.getElementById("totalDebits").textContent = money(totalDebits);
+      document.getElementById("totalCredits").textContent = money(totalCredits);
+      document.getElementById("netDifference").textContent = money(totalDebits - totalCredits);
+    }
+
+    function renderJournal(entries) {
+      const tbody = document.getElementById("journalBody");
+      tbody.innerHTML = "";
+
+      if (!entries.length) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="7">
+              <div class="empty">No entries yet.</div>
+            </td>
+          </tr>
+        `;
+        return;
+      }
+
+      entries.forEach((entry, index) => {
+        const row = document.createElement("tr");
+        row.innerHTML = `
+          <td>${entry.date || ""}</td>
+          <td>${entry.entryTitle}</td>
+          <td>${entry.debitTitle}</td>
+          <td class="money">${entry.debitAmount ? money(entry.debitAmount) : "-"}</td>
+          <td>${entry.creditTitle}</td>
+          <td class="money">${entry.creditAmount ? money(entry.creditAmount) : "-"}</td>
+          <td><button class="delete-btn" data-index="${index}">Delete</button></td>
+        `;
+        tbody.appendChild(row);
+      });
+
+      document.querySelectorAll(".delete-btn").forEach(btn => {
+        btn.addEventListener("click", () => {
+          const index = Number(btn.dataset.index);
+          const updated = loadEntries();
+          updated.splice(index, 1);
+          saveEntries(updated);
+          renderAll();
+        });
+      });
+    }
+
+    function buildLedger(entries) {
+      const ledgerMap = new Map();
+
+      entries.forEach(entry => {
+        const debitTitle = (entry.debitTitle || "").trim();
+        const creditTitle = (entry.creditTitle || "").trim();
+
+        if (debitTitle) {
+          if (!ledgerMap.has(debitTitle)) ledgerMap.set(debitTitle, []);
+          ledgerMap.get(debitTitle).push({
+            date: entry.date,
+            title: entry.entryTitle,
+            debit: num(entry.debitAmount),
+            credit: 0
+          });
+        }
+
+        if (creditTitle) {
+          if (!ledgerMap.has(creditTitle)) ledgerMap.set(creditTitle, []);
+          ledgerMap.get(creditTitle).push({
+            date: entry.date,
+            title: entry.entryTitle,
+            debit: 0,
+            credit: num(entry.creditAmount)
+          });
+        }
+      });
+
+      return ledgerMap;
+    }
+
+    function renderLedger(entries) {
+      const container = document.getElementById("ledgerContainer");
+      const ledgerMap = buildLedger(entries);
+
+      if (!ledgerMap.size) {
+        container.innerHTML = '<div class="empty">No ledger entries yet.</div>';
+        return;
+      }
+
+      const groupsHtml = [];
+
+      ledgerMap.forEach((items, accountName) => {
+        let runningBalance = 0;
+
+        const rows = items.map(item => {
+          runningBalance += item.debit - item.credit;
+          return `
+            <tr>
+              <td>${item.date || ""}</td>
+              <td>${item.title}</td>
+              <td class="money">${item.debit ? money(item.debit) : "-"}</td>
+              <td class="money">${item.credit ? money(item.credit) : "-"}</td>
+              <td class="money">${money(runningBalance)}</td>
+            </tr>
+          `;
+        }).join("");
+
+        groupsHtml.push(`
+          <div class="ledger-group">
+            <h3>${accountName}</h3>
+            <table>
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Entry Title</th>
+                  <th>Debit</th>
+                  <th>Credit</th>
+                  <th>Balance</th>
+                </tr>
+              </thead>
+              <tbody>${rows}</tbody>
+            </table>
+          </div>
+        `);
+      });
+
+      container.innerHTML = groupsHtml.join("");
+    }
+
+    function renderAll() {
+      const entries = loadEntries();
+      renderSummary(entries);
+      renderJournal(entries);
+      renderLedger(entries);
+    }
+
+    function addEntry() {
+      const date = document.getElementById("date").value;
+      const entryTitle = document.getElementById("entryTitle").value.trim();
+      const debitTitle = document.getElementById("debitTitle").value.trim();
+      const debitAmount = num(document.getElementById("debitAmount").value);
+      const creditTitle = document.getElementById("creditTitle").value.trim();
+      const creditAmount = num(document.getElementById("creditAmount").value);
+
+      if (!date || !entryTitle || !debitTitle || !creditTitle) {
+        alert("Please fill in the date, entry title, debit title, and credit title.");
+        return;
+      }
+
+      if (!debitAmount && !creditAmount) {
+        alert("Please enter at least one debit or credit amount.");
+        return;
+      }
+
+      if (debitAmount <= 0 && creditAmount <= 0) {
+        alert("Amounts must be greater than zero.");
+        return;
+      }
+
+      const entries = loadEntries();
+      entries.push({
+        date,
+        entryTitle,
+        debitTitle,
+        debitAmount,
+        creditTitle,
+        creditAmount
+      });
+
+      saveEntries(entries);
+
+      document.getElementById("date").value = "";
+      document.getElementById("entryTitle").value = "";
+      document.getElementById("debitTitle").value = "";
+      document.getElementById("debitAmount").value = "";
+      document.getElementById("creditTitle").value = "";
+      document.getElementById("creditAmount").value = "";
+
+      renderAll();
+    }
+
+    document.getElementById("addEntryBtn").addEventListener("click", addEntry);
+    renderAll();
+  </script>
+</body>
+</html>
