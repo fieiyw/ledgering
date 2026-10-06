@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Journal to Ledger Tracker</title>
+  <title>Journal & Ledger Tracker</title>
   <style>
     :root {
       --bg: #fff3f7;
@@ -15,7 +15,6 @@
       --muted: #6d5367;
       --border: #f3d6e3;
       --shadow: 0 6px 18px rgba(240, 98, 146, 0.12);
-      --green: #2aa678;
       --danger: #d65c74;
     }
 
@@ -70,7 +69,7 @@
 
     .form-grid {
       display: grid;
-      grid-template-columns: repeat(6, minmax(150px, 1fr));
+      grid-template-columns: 1.2fr 1fr 1fr;
       gap: 14px;
       align-items: end;
     }
@@ -116,6 +115,7 @@
       border: none;
       font-weight: 700;
       cursor: pointer;
+      margin-top: 14px;
     }
 
     .primary-btn:hover {
@@ -155,7 +155,7 @@
 
     .two-col {
       display: grid;
-      grid-template-columns: 1.1fr 1fr;
+      grid-template-columns: 1.2fr 1fr;
       gap: 24px;
     }
 
@@ -246,31 +246,13 @@
       font-size: 1.1rem;
     }
 
-    @media (max-width: 1100px) {
+    @media (max-width: 900px) {
       .form-grid {
-        grid-template-columns: repeat(3, minmax(160px, 1fr));
+        grid-template-columns: 1fr;
       }
 
       .two-col {
         grid-template-columns: 1fr;
-      }
-    }
-
-    @media (max-width: 640px) {
-      .form-grid {
-        grid-template-columns: 1fr;
-      }
-
-      .summary-row {
-        grid-template-columns: 1fr;
-      }
-
-      h1 {
-        font-size: 2rem;
-      }
-
-      .title-row {
-        flex-direction: column;
       }
     }
   </style>
@@ -285,39 +267,22 @@
     <div class="panel">
       <div class="form-grid">
         <div class="field">
-          <label for="date">Date</label>
-          <input id="date" type="date" />
-        </div>
-
-        <div class="field">
           <label for="title">Title</label>
           <input id="title" type="text" placeholder="Cash Sale" />
         </div>
 
         <div class="field">
-          <label for="debitAccount">Debit Account</label>
-          <input id="debitAccount" type="text" placeholder="Cash" />
+          <label for="debit">Debit</label>
+          <input id="debit" type="number" min="0" step="0.01" placeholder="0.00" />
         </div>
 
         <div class="field">
-          <label for="debitAmount">Debit Amount</label>
-          <input id="debitAmount" type="number" min="0" step="0.01" placeholder="0.00" />
-        </div>
-
-        <div class="field">
-          <label for="creditAccount">Credit Account</label>
-          <input id="creditAccount" type="text" placeholder="Sales Revenue" />
-        </div>
-
-        <div class="field">
-          <label for="creditAmount">Credit Amount</label>
-          <input id="creditAmount" type="number" min="0" step="0.01" placeholder="0.00" />
+          <label for="credit">Credit</label>
+          <input id="credit" type="number" min="0" step="0.01" placeholder="0.00" />
         </div>
       </div>
 
-      <div style="margin-top: 18px;">
-        <button id="addEntryBtn" class="primary-btn">Add Journal Entry</button>
-      </div>
+      <button id="addEntryBtn" class="primary-btn">Add Entry</button>
 
       <div class="summary-row">
         <div class="summary-box">
@@ -343,12 +308,9 @@
         <table>
           <thead>
             <tr>
-              <th>Date</th>
               <th>Title</th>
-              <th>Debit Account</th>
-              <th>Debit Amount</th>
-              <th>Credit Account</th>
-              <th>Credit Amount</th>
+              <th>Debit</th>
+              <th>Credit</th>
               <th>Action</th>
             </tr>
           </thead>
@@ -366,7 +328,7 @@
   </div>
 
   <script>
-    const storageKey = "journalLedgerEntries";
+    const storageKey = "journalSimpleEntries";
 
     function loadEntries() {
       const saved = localStorage.getItem(storageKey);
@@ -390,8 +352,8 @@
     }
 
     function renderSummary(entries) {
-      const totalDebits = entries.reduce((sum, entry) => sum + num(entry.debitAmount), 0);
-      const totalCredits = entries.reduce((sum, entry) => sum + num(entry.creditAmount), 0);
+      const totalDebits = entries.reduce((sum, entry) => sum + num(entry.debit), 0);
+      const totalCredits = entries.reduce((sum, entry) => sum + num(entry.credit), 0);
 
       document.getElementById("totalDebits").textContent = money(totalDebits);
       document.getElementById("totalCredits").textContent = money(totalCredits);
@@ -405,7 +367,7 @@
       if (!entries.length) {
         tbody.innerHTML = `
           <tr>
-            <td colspan="7">
+            <td colspan="4">
               <div class="empty">No entries yet.</div>
             </td>
           </tr>
@@ -416,12 +378,9 @@
       entries.forEach((entry, index) => {
         const row = document.createElement("tr");
         row.innerHTML = `
-          <td>${entry.date || ""}</td>
           <td>${entry.title}</td>
-          <td>${entry.debitAccount}</td>
-          <td class="money">${entry.debitAmount ? money(entry.debitAmount) : "-"}</td>
-          <td>${entry.creditAccount}</td>
-          <td class="money">${entry.creditAmount ? money(entry.creditAmount) : "-"}</td>
+          <td class="money">${entry.debit ? money(entry.debit) : "-"}</td>
+          <td class="money">${entry.credit ? money(entry.credit) : "-"}</td>
           <td><button class="delete-btn" data-index="${index}">Delete</button></td>
         `;
         tbody.appendChild(row);
@@ -438,56 +397,38 @@
       });
     }
 
-    function buildLedger(entries) {
+    function renderLedger(entries) {
+      const container = document.getElementById("ledgerContainer");
       const ledgerMap = new Map();
 
       entries.forEach(entry => {
-        const debitAccount = (entry.debitAccount || "").trim();
-        const creditAccount = (entry.creditAccount || "").trim();
+        const title = (entry.title || "Untitled").trim();
 
-        if (debitAccount) {
-          if (!ledgerMap.has(debitAccount)) ledgerMap.set(debitAccount, []);
-          ledgerMap.get(debitAccount).push({
-            date: entry.date,
-            title: entry.title,
-            debit: num(entry.debitAmount),
-            credit: 0
-          });
+        if (!ledgerMap.has(title)) {
+          ledgerMap.set(title, []);
         }
 
-        if (creditAccount) {
-          if (!ledgerMap.has(creditAccount)) ledgerMap.set(creditAccount, []);
-          ledgerMap.get(creditAccount).push({
-            date: entry.date,
-            title: entry.title,
-            debit: 0,
-            credit: num(entry.creditAmount)
-          });
-        }
+        ledgerMap.get(title).push({
+          title: title,
+          debit: num(entry.debit),
+          credit: num(entry.credit)
+        });
       });
-
-      return ledgerMap;
-    }
-
-    function renderLedger(entries) {
-      const container = document.getElementById("ledgerContainer");
-      const ledgerMap = buildLedger(entries);
 
       if (!ledgerMap.size) {
         container.innerHTML = '<div class="empty">No ledger entries yet.</div>';
         return;
       }
 
-      const groupsHtml = [];
+      const html = [];
 
-      ledgerMap.forEach((items, accountName) => {
+      ledgerMap.forEach((items, title) => {
         let runningBalance = 0;
 
         const rows = items.map(item => {
           runningBalance += item.debit - item.credit;
           return `
             <tr>
-              <td>${item.date || ""}</td>
               <td>${item.title}</td>
               <td class="money">${item.debit ? money(item.debit) : "-"}</td>
               <td class="money">${item.credit ? money(item.credit) : "-"}</td>
@@ -496,13 +437,12 @@
           `;
         }).join("");
 
-        groupsHtml.push(`
+        html.push(`
           <div class="ledger-group">
-            <h3>${accountName}</h3>
+            <h3>${title}</h3>
             <table>
               <thead>
                 <tr>
-                  <th>Date</th>
                   <th>Title</th>
                   <th>Debit</th>
                   <th>Credit</th>
@@ -515,7 +455,7 @@
         `);
       });
 
-      container.innerHTML = groupsHtml.join("");
+      container.innerHTML = html.join("");
     }
 
     function renderAll() {
@@ -526,57 +466,42 @@
     }
 
     function addEntry() {
-      const date = document.getElementById("date").value;
       const title = document.getElementById("title").value.trim();
-      const debitAccount = document.getElementById("debitAccount").value.trim();
-      const debitAmount = num(document.getElementById("debitAmount").value);
-      const creditAccount = document.getElementById("creditAccount").value.trim();
-      const creditAmount = num(document.getElementById("creditAmount").value);
+      const debit = num(document.getElementById("debit").value);
+      const credit = num(document.getElementById("credit").value);
 
-      if (!title || !debitAccount || !creditAccount) {
-        alert("Please fill in the title, debit account, and credit account.");
+      if (!title) {
+        alert("Please enter a title.");
         return;
       }
 
-      if (!debitAmount && !creditAmount) {
-        alert("Please enter a debit amount and/or credit amount.");
+      if (!debit && !credit) {
+        alert("Please enter at least one value for debit or credit.");
         return;
       }
 
-      if (debitAmount <= 0 && creditAmount <= 0) {
-        alert("Amounts must be greater than zero.");
-        return;
-      }
-
-      if (debitAmount > 0 && creditAmount > 0) {
-        alert("For a single journal entry, debit and credit should be separate lines with their own accounts.");
+      if (debit > 0 && credit > 0) {
+        alert("Use either debit or credit for this entry, not both.");
         return;
       }
 
       const entries = loadEntries();
       entries.push({
-        date: date || new Date().toISOString().slice(0, 10),
         title,
-        debitAccount,
-        debitAmount: debitAmount > 0 ? debitAmount : 0,
-        creditAccount,
-        creditAmount: creditAmount > 0 ? creditAmount : 0
+        debit,
+        credit
       });
 
       saveEntries(entries);
 
-      document.getElementById("date").value = "";
       document.getElementById("title").value = "";
-      document.getElementById("debitAccount").value = "";
-      document.getElementById("debitAmount").value = "";
-      document.getElementById("creditAccount").value = "";
-      document.getElementById("creditAmount").value = "";
+      document.getElementById("debit").value = "";
+      document.getElementById("credit").value = "";
 
       renderAll();
     }
 
     document.getElementById("addEntryBtn").addEventListener("click", addEntry);
-
     renderAll();
   </script>
 </body>
