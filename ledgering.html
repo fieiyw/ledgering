@@ -16,6 +16,7 @@
       --border: #f3d6e3;
       --shadow: 0 6px 18px rgba(240, 98, 146, 0.12);
       --danger: #d65c74;
+      --green: #2a9d74;
     }
 
     * { box-sizing: border-box; }
@@ -237,6 +238,41 @@
       background: #d14163;
     }
 
+    .statement-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      padding: 18px;
+    }
+
+    .statement-card {
+      background: #fffafd;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 16px;
+    }
+
+    .statement-card h3 {
+      margin-top: 0;
+      margin-bottom: 14px;
+      font-size: 1.4rem;
+    }
+
+    .statement-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 8px 0;
+      border-bottom: 1px solid #f4e2eb;
+    }
+
+    .statement-row.total {
+      font-weight: 700;
+      font-size: 1.1rem;
+      border-bottom: none;
+      padding-top: 12px;
+    }
+
     .footer {
       margin-top: 30px;
       text-align: center;
@@ -251,7 +287,7 @@
         grid-template-columns: repeat(3, minmax(160px, 1fr));
       }
 
-      .two-col {
+      .two-col, .statement-grid {
         grid-template-columns: 1fr;
       }
     }
@@ -357,6 +393,47 @@
       <div class="section">
         <div class="section-header">Ledger</div>
         <div id="ledgerContainer"></div>
+      </div>
+    </div>
+
+    <div class="section" style="margin-top: 24px;">
+      <div class="section-header">Financial Statement</div>
+      <div class="statement-grid">
+        <div class="statement-card">
+          <h3>Income Statement</h3>
+          <div class="statement-row">
+            <span>Revenue</span>
+            <span id="revenueTotal">$0.00</span>
+          </div>
+          <div class="statement-row">
+            <span>Expenses</span>
+            <span id="expenseTotal">$0.00</span>
+          </div>
+          <div class="statement-row total">
+            <span>Net Income</span>
+            <span id="netIncomeTotal">$0.00</span>
+          </div>
+        </div>
+
+        <div class="statement-card">
+          <h3>Balance Sheet</h3>
+          <div class="statement-row">
+            <span>Assets</span>
+            <span id="assetsTotal">$0.00</span>
+          </div>
+          <div class="statement-row">
+            <span>Liabilities</span>
+            <span id="liabilitiesTotal">$0.00</span>
+          </div>
+          <div class="statement-row">
+            <span>Equity</span>
+            <span id="equityTotal">$0.00</span>
+          </div>
+          <div class="statement-row total">
+            <span>Total</span>
+            <span id="balanceSheetTotal">$0.00</span>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -516,11 +593,66 @@
       container.innerHTML = groupsHtml.join("");
     }
 
+    function categorizeAccount(accountName) {
+      const a = accountName.toLowerCase();
+
+      if (/cash|inventory|equipment|building|vehicle|accounts receivable|supplies|land|prepaid|bank|asset/.test(a)) return "asset";
+      if (/payable|loan|note|liability|debt/.test(a)) return "liability";
+      if (/equity|capital|owner|retained|drawings/.test(a)) return "equity";
+      if (/revenue|sales|income|service|commission|gain/.test(a)) return "revenue";
+      if (/expense|rent|salary|wages|utilities|insurance|supplies|advertising|depreciation|cost|fee/.test(a)) return "expense";
+      return "other";
+    }
+
+    function computeFinancialStatement(entries) {
+      const ledgerMap = buildLedger(entries);
+      let revenue = 0;
+      let expenses = 0;
+      let assets = 0;
+      let liabilities = 0;
+      let equity = 0;
+
+      ledgerMap.forEach((items, accountName) => {
+        const category = categorizeAccount(accountName);
+        let net = 0;
+
+        items.forEach(item => {
+          net += item.debit - item.credit;
+        });
+
+        if (category === "revenue") {
+          revenue += Math.max(net, 0);
+        } else if (category === "expense") {
+          expenses += Math.abs(net);
+        } else if (category === "asset") {
+          assets += net;
+        } else if (category === "liability") {
+          liabilities += net;
+        } else if (category === "equity") {
+          equity += net;
+        }
+      });
+
+      const netIncome = revenue - expenses;
+
+      document.getElementById("revenueTotal").textContent = money(revenue);
+      document.getElementById("expenseTotal").textContent = money(expenses);
+      document.getElementById("netIncomeTotal").textContent = money(netIncome);
+
+      document.getElementById("assetsTotal").textContent = money(assets);
+      document.getElementById("liabilitiesTotal").textContent = money(liabilities);
+      document.getElementById("equityTotal").textContent = money(equity);
+
+      const totalSheet = assets - liabilities - equity;
+      document.getElementById("balanceSheetTotal").textContent = money(totalSheet);
+    }
+
     function renderAll() {
       const entries = loadEntries();
       renderSummary(entries);
       renderJournal(entries);
       renderLedger(entries);
+      computeFinancialStatement(entries);
     }
 
     function addEntry() {
